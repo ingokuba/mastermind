@@ -27,3 +27,9 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
 }
+
+android.applicationVariants.all { variant ->
+    variant.outputs.all {
+        outputFileName = "prototype-${variant.versionName}.apk"
+    }
+}

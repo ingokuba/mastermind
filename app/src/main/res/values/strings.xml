@@ -3,6 +3,6 @@
     <string name="rules_text">Hier könnte Ihre Kurzbeschreibung stehen.</string>
     <string name="app_rules">Regeln</string>
     <string name="app_about">Über diese App</string>
-    <string name="app_version">Version: 0.1 (Prototyp)</string>
+    <string name="app_version">Version: 1.0</string>
     <string name="app_copyright">Copyright: MOSOF Games</string>
 </resources>
