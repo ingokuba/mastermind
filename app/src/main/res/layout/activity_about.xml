@@ -1,43 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/app_about"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/app_about"
-        android:textStyle="bold"
-        android:textSize="32sp"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        />
+        android:text="@string/app_about"
+        android:textSize="32sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/about_version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/app_version"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
-        />
+        android:text="@string/app_version"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/about_copyright"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/app_copyright"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginTop="8dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
-        />
+        android:text="@string/app_copyright"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/about_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/app_group"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
 </LinearLayout>
