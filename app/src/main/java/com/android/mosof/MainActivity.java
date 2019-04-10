@@ -7,6 +7,8 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.mosof.setup.GameSetupActivity;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     @Override
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intentAbout);
                 break;
             case R.id.new_game:
-                startActivity(new Intent(this, GameActivity.class));
+                startActivity(new Intent(this, GameSetupActivity.class));
                 break;
             case R.id.app_highscore:
                 Intent intentHighscore = new Intent(this, HighscoreActivity.class);
