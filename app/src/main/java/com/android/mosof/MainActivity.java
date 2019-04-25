@@ -2,11 +2,10 @@ package com.android.mosof;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.view.View;
 import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -23,9 +22,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Button buttonRules = findViewById(R.id.app_rules);
         Button buttonAbout = findViewById(R.id.app_about);
+        Button buttonNewGame = findViewById(R.id.new_game);
 
         buttonRules.setOnClickListener(this);
         buttonAbout.setOnClickListener(this);
+        buttonNewGame.setOnClickListener(this);
     }
 
     @Override
@@ -38,6 +39,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.app_about:
                 Intent intentAbout = new Intent(this, AboutActivity.class);
                 startActivity(intentAbout);
+                break;
+            case R.id.new_game:
+                startActivity(new Intent(this, GameActivity.class));
                 break;
             default:
                 break;

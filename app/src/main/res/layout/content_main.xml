@@ -21,6 +21,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/new_game"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/new_game"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/app_rules"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/app_name" />
+
+    <Button
         android:id="@+id/app_rules"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,7 +40,7 @@
         app:layout_constraintBottom_toTopOf="@id/app_about"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/app_name" />
+        app:layout_constraintTop_toBottomOf="@id/new_game" />
 
     <Button
         android:id="@+id/app_about"
@@ -41,5 +52,5 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/app_rules" />
-
+    
 </androidx.constraintlayout.widget.ConstraintLayout>

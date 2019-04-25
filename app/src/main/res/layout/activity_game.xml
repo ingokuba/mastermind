@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GameActivity">
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/border"
+        app:layout_constraintBottom_toTopOf="@+id/tableLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/border_bottom"
+                android:gravity="center_horizontal|center_vertical">
+
+                <TextView
+                    android:id="@+id/rowNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight=".5"
+                    android:text="1"
+                    android:textColor="@android:color/black"
+                    android:textSize="30dp" />
+
+                <ImageView
+                    android:id="@+id/hole1"
+                    android:layout_weight="1"
+                    android:src="@drawable/game_hole" />
+
+                <ImageView
+                    android:id="@+id/hole2"
+                    android:layout_weight="1"
+                    android:src="@drawable/game_hole" />
+
+                <ImageView
+                    android:id="@+id/hole3"
+                    android:layout_weight="1"
+                    android:src="@drawable/game_hole" />
+
+                <ImageView
+                    android:id="@+id/hole4"
+                    android:layout_weight="1"
+                    android:src="@drawable/game_hole" />
+
+                <ImageView
+                    android:id="@+id/hole5"
+                    android:layout_weight="1"
+                    android:src="@drawable/game_hole" />
+
+                <ImageView
+                    android:id="@+id/hole6"
+                    android:layout_weight="1"
+                    android:src="@drawable/game_hole" />
+
+                <ImageView
+                    android:id="@+id/hole7"
+                    android:layout_weight="1"
+                    android:src="@drawable/game_hole" />
+
+                <ImageView
+                    android:id="@+id/hole8"
+                    android:layout_weight="1"
+                    android:src="@drawable/game_hole" />
+
+                <TextView
+                    android:id="@+id/whiteNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".5"
+                    android:background="@android:color/black"
+                    android:text="0"
+                    android:textColor="@android:color/white"
+                    android:textSize="30dp" />
+
+                <TextView
+                    android:id="@+id/blackNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".5"
+                    android:background="@android:color/white"
+                    android:text="0"
+                    android:textColor="@android:color/black"
+                    android:textSize="30dp" />
+            </TableRow>
+        </TableLayout>
+
+    </ScrollView>
+
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/border_missing_top"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/color1"
+                android:layout_weight="1"
+                android:src="@drawable/game_circle" />
+
+            <ImageView
+                android:id="@+id/color2"
+                android:layout_weight="1"
+                android:src="@drawable/game_circle" />
+
+            <ImageView
+                android:id="@+id/color3"
+                android:layout_weight="1"
+                android:src="@drawable/game_circle" />
+
+            <ImageView
+                android:id="@+id/color4"
+                android:layout_weight="1"
+                android:src="@drawable/game_circle" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/color5"
+                android:layout_weight="1"
+                android:src="@drawable/game_circle" />
+
+            <ImageView
+                android:id="@+id/color6"
+                android:layout_weight="1"
+                android:src="@drawable/game_circle" />
+
+            <ImageView
+                android:id="@+id/color7"
+                android:layout_weight="1"
+                android:src="@drawable/game_circle" />
+
+            <ImageView
+                android:id="@+id/color8"
+                android:layout_weight="1"
+                android:src="@drawable/game_circle" />
+
+        </TableRow>
+
+    </TableLayout>
+
+    <Button
+        android:id="@+id/button_undo"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/app_game_undo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button_submit"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/app_game_submit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
