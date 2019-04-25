@@ -23,10 +23,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button buttonRules = findViewById(R.id.app_rules);
         Button buttonAbout = findViewById(R.id.app_about);
         Button buttonNewGame = findViewById(R.id.new_game);
+        Button buttonHighscore = findViewById(R.id.app_highscore);
 
         buttonRules.setOnClickListener(this);
         buttonAbout.setOnClickListener(this);
         buttonNewGame.setOnClickListener(this);
+        buttonHighscore.setOnClickListener(this);
     }
 
     @Override
@@ -42,6 +44,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.new_game:
                 startActivity(new Intent(this, GameActivity.class));
+                break;
+            case R.id.app_highscore:
+                Intent intentHighscore = new Intent(this, HighscoreActivity.class);
+                startActivity(intentHighscore);
                 break;
             default:
                 break;
