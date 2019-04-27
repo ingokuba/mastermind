@@ -5,10 +5,12 @@
         aus farbigen Pins und nach jeder Runde erhälst du einen Hinweis,
         der dir beim nächsten Versuch weiterhelfen kann. Wiederhole die
         Runden solange, bis du den geheimen Code herausfinden kannst.
-        Es gibt folgende Hinweise: \n\n
-        weiß: richtige Farbe, aber falsche Position \n
-        schwarz: richtige Farbe und richtige Position
+        Es gibt folgende Hinweise:
     </string>
+    <string name="rules_white">richtige\u00A0Farbe, falsche\u00A0Position</string>
+    <string name="rules_black">richtige\u00A0Farbe, richtige\u00A0Position</string>
+    <string name="how_to_play_heading">How to play:</string>
+    <string name="how_to_play">Zum Setzen den Pin zum gewünschten Loch ziehen. Entfernen durch Klicken.</string>
     <string name="app_rules">Regeln</string>
     <string name="app_highscore">Highscores</string>
     <string name="app_about">Über diese App</string>
@@ -28,10 +30,13 @@
     <string name="cancel">Abbrechen</string>
     <string name="start_game">Spiel starten</string>
     <string name="hole_count">Anzahl Löcher</string>
+    <string name="hole_count_wrong">Falsche Loch-Anzahl.</string>
     <string name="hole_count_error">Anzahl Löcher muss gesetzt sein.</string>
     <string name="hole_count_toobig_error">Anzahl Löcher darf nicht Anzahl Farben überschreiten, wenn mehrfache und leere Pins nicht erlaubt sind.</string>
     <string name="pin_count">Anzahl Farben</string>
+    <string name="pin_count_wrong">Falsche Pin-Anzahl.</string>
     <string name="pin_colors">Farben der Pins</string>
+    <string name="pin_color_wrong">Unbekannte Farbe.</string>
     <string name="pin_color_error">Farben der Pins dürfen nicht doppelt auftreten.</string>
     <string name="max_tries">Max. Versuche</string>
     <string name="max_tries_default">12</string>

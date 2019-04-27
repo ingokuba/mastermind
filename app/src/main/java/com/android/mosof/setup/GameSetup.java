@@ -3,9 +3,16 @@ package com.android.mosof.setup;
 import com.android.mosof.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GameSetup {
+
+    public static final List<Integer> HOLE_COUNTS = Arrays.asList(4, 5, 6, 8);
+    public static final List<Integer> PIN_COUNTS = Arrays.asList(6, 7, 8);
+    public static final List<Integer> PIN_COLORS = Arrays.asList(android.R.color.holo_blue_dark, android.R.color.holo_red_dark,
+            android.R.color.holo_purple, android.R.color.holo_green_dark, android.R.color.holo_orange_dark,
+            android.R.color.darker_gray, android.R.color.holo_orange_light, android.R.color.holo_red_light);
 
     /**
      * Amount of holes for the pins.
@@ -101,20 +108,29 @@ public class GameSetup {
         }
         if (holeCount == null) {
             errors.add(R.string.hole_count_error);
+        } else if (!HOLE_COUNTS.contains(holeCount)) {
+            errors.add(R.string.hole_count_wrong);
         }
         checkColors(errors);
         if (solution == null) {
             errors.add(R.string.solution_error);
-        }
-        if (solution.size() != holeCount) {
+        } else if (solution.size() != holeCount) {
             errors.add(R.string.solution_error_length);
         }
         return errors;
     }
 
     private void checkColors(List<Integer> errors) {
+        if (!PIN_COUNTS.contains(colors.size())) {
+            errors.add(R.string.pin_count_wrong);
+            return;
+        }
         List<Integer> temp = new ArrayList<>();
         for (Integer pin : colors) {
+            if (!PIN_COLORS.contains(pin)) {
+                errors.add(R.string.pin_color_wrong);
+                return;
+            }
             if (temp.contains(pin)) {
                 errors.add(R.string.pin_color_error);
             }

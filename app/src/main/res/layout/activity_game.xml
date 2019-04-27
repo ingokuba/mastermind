@@ -24,6 +24,7 @@
             android:layout_margin="2dp">
 
             <TableRow
+                android:id="@+id/hole_row"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/border_bottom"
@@ -38,46 +39,6 @@
                     android:text="1"
                     android:textColor="@android:color/black"
                     android:textSize="30dp" />
-
-                <ImageView
-                    android:id="@+id/hole1"
-                    android:layout_weight="1"
-                    android:src="@drawable/game_hole" />
-
-                <ImageView
-                    android:id="@+id/hole2"
-                    android:layout_weight="1"
-                    android:src="@drawable/game_hole" />
-
-                <ImageView
-                    android:id="@+id/hole3"
-                    android:layout_weight="1"
-                    android:src="@drawable/game_hole" />
-
-                <ImageView
-                    android:id="@+id/hole4"
-                    android:layout_weight="1"
-                    android:src="@drawable/game_hole" />
-
-                <ImageView
-                    android:id="@+id/hole5"
-                    android:layout_weight="1"
-                    android:src="@drawable/game_hole" />
-
-                <ImageView
-                    android:id="@+id/hole6"
-                    android:layout_weight="1"
-                    android:src="@drawable/game_hole" />
-
-                <ImageView
-                    android:id="@+id/hole7"
-                    android:layout_weight="1"
-                    android:src="@drawable/game_hole" />
-
-                <ImageView
-                    android:id="@+id/hole8"
-                    android:layout_weight="1"
-                    android:src="@drawable/game_hole" />
 
                 <TextView
                     android:id="@+id/whiteNumber"
@@ -118,80 +79,37 @@
 
 
         <TableRow
+            android:id="@+id/color_row_1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center">
-
-            <ImageView
-                android:id="@+id/color1"
-                android:layout_weight="1"
-                android:src="@drawable/game_circle" />
-
-            <ImageView
-                android:id="@+id/color2"
-                android:layout_weight="1"
-                android:src="@drawable/game_circle" />
-
-            <ImageView
-                android:id="@+id/color3"
-                android:layout_weight="1"
-                android:src="@drawable/game_circle" />
-
-            <ImageView
-                android:id="@+id/color4"
-                android:layout_weight="1"
-                android:src="@drawable/game_circle" />
-
-        </TableRow>
+            android:gravity="center" />
 
         <TableRow
+            android:id="@+id/color_row_2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center">
-
-            <ImageView
-                android:id="@+id/color5"
-                android:layout_weight="1"
-                android:src="@drawable/game_circle" />
-
-            <ImageView
-                android:id="@+id/color6"
-                android:layout_weight="1"
-                android:src="@drawable/game_circle" />
-
-            <ImageView
-                android:id="@+id/color7"
-                android:layout_weight="1"
-                android:src="@drawable/game_circle" />
-
-            <ImageView
-                android:id="@+id/color8"
-                android:layout_weight="1"
-                android:src="@drawable/game_circle" />
-
-        </TableRow>
-
+            android:gravity="center" />
     </TableLayout>
 
     <Button
         android:id="@+id/button_undo"
-        android:layout_width="150dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_margin="8dp"
         android:text="@string/app_game_undo"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/button_submit"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/button_submit"
-        android:layout_width="150dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_margin="8dp"
         android:text="@string/app_game_submit"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/button_undo" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

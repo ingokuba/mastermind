@@ -5,7 +5,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -29,21 +31,16 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import static com.android.mosof.setup.GameSetup.HOLE_COUNTS;
+import static com.android.mosof.setup.GameSetup.PIN_COLORS;
+import static com.android.mosof.setup.GameSetup.PIN_COUNTS;
+
 public class GameSetupActivity extends AppCompatActivity {
 
-    public static final String GAME_PREFERENCES = "GamePreferences";
-
     private GameSetup setup = new GameSetup();
-
-    private static final Integer[] HOLE_COUNTS = {4, 5, 6, 8};
-    private static final Integer[] PIN_COUNTS = {6, 7, 8};
-    private static final List<Integer> PIN_COLORS = Arrays.asList(android.R.color.holo_blue_dark, android.R.color.holo_red_dark,
-            android.R.color.holo_purple, android.R.color.holo_green_dark, android.R.color.holo_orange_dark,
-            android.R.color.darker_gray, android.R.color.holo_orange_light, android.R.color.holo_red_light);
 
     private Spinner holeCountSpinner;
     private Spinner pinCountSpinner;
@@ -94,35 +91,35 @@ public class GameSetupActivity extends AppCompatActivity {
      * Loads the setup previously stored in shared preferences by the user.
      */
     private void loadPreviousSetup() {
-        String json = getSharedPreferences(GAME_PREFERENCES, 0).getString(GameSetup.class.getSimpleName(), null);
+        String json = getSharedPreferences().getString(GameSetup.class.getSimpleName(), null);
         if (json == null) {
             return;
         }
-        GameSetup prevSetup;
         try {
-            prevSetup = new Gson().fromJson(json, GameSetup.class);
+            setup = new Gson().fromJson(json, GameSetup.class);
         } catch (JsonSyntaxException jse) {
             // json incompatible - reset
-            getSharedPreferences(GAME_PREFERENCES, 0).edit().putString(GameSetup.class.getSimpleName(), null).apply();
+            setup = new GameSetup();
+            getSharedPreferences().edit().putString(GameSetup.class.getSimpleName(), null).apply();
             return;
         }
         // max tries
         EditText maxTriesInput = findViewById(R.id.max_tries_input);
-        maxTriesInput.setText(String.valueOf(prevSetup.getMaxTries()));
+        maxTriesInput.setText(String.valueOf(setup.getMaxTries()));
         // hole count
-        Integer id = getItemId(holeCountSpinner, prevSetup.getHoleCount());
+        Integer id = getItemId(holeCountSpinner, setup.getHoleCount());
         if (id != null) {
             holeCountSpinner.setSelection(id);
         }
         // color count
-        id = getItemId(pinCountSpinner, prevSetup.getColors().size());
+        id = getItemId(pinCountSpinner, setup.getColors().size());
         if (id != null) {
             pinCountSpinner.setSelection(id);
         }
         // duplicate pins
-        duplicatePins.setChecked(prevSetup.getDuplicatePins());
+        duplicatePins.setChecked(setup.getDuplicatePins());
         // empty pins
-        emptyPins.setChecked(prevSetup.getEmptyPins());
+        emptyPins.setChecked(setup.getEmptyPins());
     }
 
     /**
@@ -316,8 +313,9 @@ public class GameSetupActivity extends AppCompatActivity {
                     return;
                 }
                 String json = new GsonBuilder().setPrettyPrinting().create().toJson(setup);
-                if (getSharedPreferences(GAME_PREFERENCES, 0).edit().putString(GameSetup.class.getSimpleName(), json).commit()) {
+                if (getSharedPreferences().edit().putString(GameSetup.class.getSimpleName(), json).commit()) {
                     startActivity(new Intent(context, GameActivity.class));
+                    finish();
                 } else {
                     Toast.makeText(context, R.string.setup_fail, Toast.LENGTH_SHORT).show();
                 }
@@ -372,6 +370,10 @@ public class GameSetupActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         };
+    }
+
+    private SharedPreferences getSharedPreferences() {
+        return PreferenceManager.getDefaultSharedPreferences(this);
     }
 }
 
