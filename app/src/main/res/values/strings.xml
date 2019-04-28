@@ -28,6 +28,10 @@
     <string name="app_game_submit">Abgeben</string>
     <string name="new_game">Neues Spiel</string>
     <string name="cancel">Abbrechen</string>
+    <string name="background">Hintergrund</string>
+    <string name="wood">Holz</string>
+    <string name="morocco">Marokko</string>
+    <string name="banana">Bananen</string>
     <string name="start_game">Spiel starten</string>
     <string name="hole_count">Anzahl Löcher</string>
     <string name="hole_count_wrong">Falsche Loch-Anzahl.</string>

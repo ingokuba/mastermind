@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.android.mosof.R;
-
 import java.util.List;
 
 public class ColorAdapter extends BaseAdapter {
