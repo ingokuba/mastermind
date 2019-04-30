@@ -1,7 +1,11 @@
 package com.android.mosof;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -13,6 +17,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
@@ -24,6 +29,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.android.mosof.components.ColorDrawable;
+import com.android.mosof.highscore.Highscore;
+import com.android.mosof.highscore.HighscoreDatabase;
 import com.android.mosof.setup.GameSetup;
 import com.android.mosof.setup.GameSetupActivity;
 import com.google.gson.Gson;
@@ -190,10 +197,14 @@ public class GameActivity extends AppCompatActivity {
                 }
                 if (checkRow(lastRow)) {
                     // insert new row
-                    holes.addView(createHoleRow());
+                    TableRow newRow = createHoleRow();
                     // remove listeners from lastRow
-                    evaluateRow(lastRow);
-
+                    boolean won = evaluateRow(lastRow);
+                    if (won) {
+                        winDialog(holes.getChildCount(), setup.getHoleCount(), setup.getColors().size(), setup.getEmptyPins(), setup.getDuplicatePins()).show();
+                    } else {
+                        holes.addView(newRow);
+                    }
                     final ScrollView sv = findViewById(R.id.holes_scroll_view);
                     sv.post(new Runnable() {
                         @Override
@@ -309,7 +320,7 @@ public class GameActivity extends AppCompatActivity {
     /**
      * Removes all listeners from the rows child views and sets the solution hints.
      */
-    private void evaluateRow(TableRow row) {
+    private boolean evaluateRow(TableRow row) {
         List<Integer> configuration = new ArrayList<>();
         TextView blackHint = null;
         TextView whiteHint = null;
@@ -329,15 +340,17 @@ public class GameActivity extends AppCompatActivity {
             }
         }
         if (blackHint == null || whiteHint == null) {
-            return;
+            return false;
         }
-        evaluateResult(configuration, blackHint, whiteHint);
+        return evaluateResult(configuration, blackHint, whiteHint);
     }
 
     /**
      * Check how close the given configuration is to the solution and appraise it.
+     *
+     * @return true if game is won
      */
-    private void evaluateResult(List<Integer> configuration, TextView blackHint, TextView whiteHint) {
+    private boolean evaluateResult(List<Integer> configuration, TextView blackHint, TextView whiteHint) {
         List<Integer> solution = setup.getSolution();
         List<Integer> solutionCopy = new ArrayList<>(solution);
         List<Integer> configurationCopy = new ArrayList<>(configuration);
@@ -360,8 +373,45 @@ public class GameActivity extends AppCompatActivity {
                 }
             }
         }
+        if (black == setup.getSolution().size()) {
+            // game won
+            return true;
+        }
         blackHint.setText(String.valueOf(black));
         whiteHint.setText(String.valueOf(white));
+        return false;
+    }
+
+    /**
+     * Create a dialog where you can input your name.
+     */
+    private Dialog winDialog(final int tries, final int holes, final int pins, final boolean emptyPins, final boolean duplicatePins) {
+        final Context context = this;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = View.inflate(this, R.layout.edit_dialog, null);
+        final EditText inputField = view.findViewById(R.id.edit_dialog_input);
+        builder.setView(view).setTitle(R.string.win_title).setMessage(R.string.win_message)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String name = inputField.getText().toString();
+                        if (name.isEmpty()) {
+                            return;
+                        }
+                        // store highscore in database
+                        Highscore highscore = new Highscore(name.trim(), tries, holes, pins, emptyPins, duplicatePins);
+                        HighscoreDatabase database = HighscoreDatabase.get(context);
+                        database.highscores().insert(highscore);
+                        database.close();
+                        // store highscore to preferences
+                        String json = new Gson().toJson(highscore);
+                        getSharedPreferences().edit().putString(Highscore.class.getSimpleName(), json).apply();
+                        // switch to highscore view
+                        startActivity(new Intent(context, HighscoreActivity.class));
+                        finish();
+                    }
+                });
+        return builder.create();
     }
 
     private SharedPreferences getSharedPreferences() {

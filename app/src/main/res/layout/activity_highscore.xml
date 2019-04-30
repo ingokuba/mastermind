@@ -15,11 +15,129 @@
         android:textSize="32sp"
         android:textStyle="bold" />
 
+    <LinearLayout
+        android:id="@+id/highscore_layout_spinners"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/app_highscore"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/fab_margin"
+            android:layout_weight="2"
+            android:text="@string/hole_count"
+            android:textColor="@android:color/black" />
+
+        <Spinner
+            android:id="@+id/highscore_holes_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@null" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/fab_margin"
+            android:layout_weight="2"
+            android:text="@string/pin_count"
+            android:textColor="@android:color/black" />
+
+        <Spinner
+            android:id="@+id/highscore_pins_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@null" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/highscore_layout_checks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/highscore_layout_spinners"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/highscore_empty_check"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+            android:text="@string/empty_pins" />
+
+        <CheckBox
+            android:id="@+id/highscore_duplicate_check"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+            android:text="@string/duplicate_pins" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/highscore_divider1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/highscore_layout_checks"
+        android:background="@android:color/darker_gray" />
+
+    <TableRow
+        android:id="@+id/highscore_table_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/highscore_divider1"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+        android:paddingEnd="?android:attr/listPreferredItemPaddingEnd">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="@string/place"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="3"
+            android:text="@string/player"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="@string/tries"
+            android:textStyle="bold" />
+    </TableRow>
+
+    <View
+        android:id="@+id/highscore_divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/highscore_table_header"
+        android:background="@android:color/darker_gray" />
+
     <ListView
         android:id="@+id/highscore"
-        android:layout_below="@id/app_highscore"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-
+        android:layout_height="match_parent"
+        android:layout_below="@id/highscore_divider2" />
 </RelativeLayout>

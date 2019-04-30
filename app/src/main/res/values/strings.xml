@@ -60,4 +60,10 @@
     <string name="pins_missing">Alle Löcher müssen gesetzt sein!</string>
     <string name="pins_duplicate">Farben dürfen nicht mehrfach auftreten!</string>
     <string name="max_tries_surpassed">Maximale Versuche überschritten!</string>
+    <string name="win_title">Gewonnen!</string>
+    <string name="win_message">Gib deinen Namen ein</string>
+    <string name="empty_pins">Leere Löcher</string>
+    <string name="duplicate_pins">Mehrfache Farben</string>
+    <string name="place">Platz</string>
+    <string name="tries">Versuche</string>
 </resources>
