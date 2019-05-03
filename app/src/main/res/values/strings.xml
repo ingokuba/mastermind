@@ -53,4 +53,7 @@
     <string name="solution_error_length">Lösung muss Länge der Lochanzahl haben.</string>
     <string name="solution_success">Lösung wurde gesetzt.</string>
     <string name="setup_fail">Spiel konnte nicht gestartet werden</string>
+    <string name="pins_missing">Alle Löcher müssen gesetzt sein!</string>
+    <string name="pins_duplicate">Farben dürfen nicht mehrfach auftreten!</string>
+    <string name="max_tries_surpassed">Maximale Versuche überschritten!</string>
 </resources>
