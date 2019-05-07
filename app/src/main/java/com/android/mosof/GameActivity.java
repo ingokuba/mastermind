@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat;
 
 import com.android.mosof.components.ColorDrawable;
 import com.android.mosof.setup.GameSetup;
+import com.android.mosof.setup.GameSetupActivity;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -46,6 +47,9 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        int background = getSharedPreferences().getInt(GameSetupActivity.BACKGROUND_KEY, R.drawable.wood_background);
+        findViewById(R.id.game_screen_root).setBackgroundResource(background);
 
         setup = loadGameSetup();
         if (setup == null) {
@@ -90,10 +94,12 @@ public class GameActivity extends AppCompatActivity {
      * Create a circle with the given color.
      */
     private Drawable colorDrawable(int color) {
-        ColorDrawable drawable = new ColorDrawable(this);
+        ColorDrawable drawable = new ColorDrawable(GradientDrawable.Orientation.TR_BL,
+                new int[]{ContextCompat.getColor(this, color),
+                        ContextCompat.getColor(this, R.color.nearly_black)});
         drawable.setColorResource(color);
         drawable.setShape(GradientDrawable.OVAL);
-        drawable.setStroke(toPixels(2), ContextCompat.getColor(this, android.R.color.black));
+        drawable.setStroke(toPixels(1), ContextCompat.getColor(this, R.color.alpha96));
         int size = toPixels(40);
         drawable.setSize(size, size);
         return drawable;
@@ -263,7 +269,6 @@ public class GameActivity extends AppCompatActivity {
         TableRow row = new TableRow(this);
         TableLayout.LayoutParams params = new TableLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         row.setLayoutParams(params);
-        row.setBackgroundResource(R.drawable.border_bottom);
         // holes
         for (int i = 0; i < setup.getHoleCount(); i++) {
             ImageView hole = new ImageView(this);

@@ -31,6 +31,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -41,6 +42,12 @@ import static com.android.mosof.setup.GameSetup.PIN_COUNTS;
 public class GameSetupActivity extends AppCompatActivity {
 
     private GameSetup setup = new GameSetup();
+
+    /**
+     * Key for the background resource as integer in {@link SharedPreferences}.
+     */
+    public static final String BACKGROUND_KEY = "Background";
+    private static final List<Integer> BACKGROUNDS = Arrays.asList(R.string.wood, R.string.morocco, R.string.banana);
 
     private Spinner holeCountSpinner;
     private Spinner pinCountSpinner;
@@ -53,6 +60,17 @@ public class GameSetupActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
+        // Background for the app
+        ArrayAdapter<String> backgroundAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, getBackgroundNames());
+        Spinner backgroundSpinner = findViewById(R.id.background_selector);
+        backgroundSpinner.setAdapter(backgroundAdapter);
+        backgroundSpinner.setOnItemSelectedListener(backgroundListener());
+        // load previous background
+        int backgroundId = getSharedPreferences().getInt(BACKGROUND_KEY, R.drawable.wood_background);
+        Integer id = getItemId(backgroundSpinner, getBackgroundName(backgroundId));
+        if (id != null) {
+            backgroundSpinner.setSelection(id);
+        }
         // Amount of holes
         ArrayAdapter<Integer> holeAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, HOLE_COUNTS);
         holeCountSpinner = findViewById(R.id.hole_count);
@@ -364,6 +382,53 @@ public class GameSetupActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Integer pinCount = (Integer) parent.getItemAtPosition(position);
                 setup.setColors(PIN_COLORS.subList(0, pinCount));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        };
+    }
+
+    /**
+     * Transform string ids for the backgrounds to a string array.
+     */
+    private String[] getBackgroundNames() {
+        String[] names = new String[BACKGROUNDS.size()];
+        for (int i = 0; i < names.length; i++) {
+            names[i] = getString(BACKGROUNDS.get(i));
+        }
+        return names;
+    }
+
+    /**
+     * Get the matching background name for the drawable id.
+     */
+    private String getBackgroundName(int resourceId) {
+        switch (resourceId) {
+            case R.drawable.morocco_background:
+                return getString(R.string.morocco);
+            case R.drawable.banana_background:
+                return getString(R.string.banana);
+            default:
+                return getString(R.string.wood);
+        }
+    }
+
+    private AdapterView.OnItemSelectedListener backgroundListener() {
+        return new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String name = (String) parent.getItemAtPosition(position);
+                int resourceId = R.drawable.wood_background;
+                if (name.equals(getString(R.string.morocco))) {
+                    resourceId = R.drawable.morocco_background;
+                } else if (name.equals(getString(R.string.banana))) {
+                    resourceId = R.drawable.banana_background;
+                }
+                if (getSharedPreferences().edit().putInt(BACKGROUND_KEY, resourceId).commit()) {
+                    findViewById(R.id.setup_screen_root).setBackgroundResource(resourceId);
+                }
             }
 
             @Override
