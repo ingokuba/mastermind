@@ -7,23 +7,21 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.mosof.ColorAdapter;
+import com.android.mosof.AbstractActivity;
 import com.android.mosof.GameActivity;
 import com.android.mosof.R;
 import com.google.gson.Gson;
@@ -35,11 +33,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.android.mosof.setup.GameSetup.HOLE_COUNTS;
 import static com.android.mosof.setup.GameSetup.PIN_COLORS;
 import static com.android.mosof.setup.GameSetup.PIN_COUNTS;
 
-public class GameSetupActivity extends AppCompatActivity {
+public class GameSetupActivity extends AbstractActivity {
 
     private GameSetup setup = new GameSetup();
 
@@ -59,7 +58,6 @@ public class GameSetupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setup);
         // Background for the app
         ArrayAdapter<String> backgroundAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, getBackgroundNames());
         Spinner backgroundSpinner = findViewById(R.id.background_selector);
@@ -207,21 +205,32 @@ public class GameSetupActivity extends AppCompatActivity {
         final int holeCount = (int) holeCountSpinner.getSelectedItem();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = View.inflate(this, R.layout.solution_dialog, null);
-        final LinearLayout pinSelection = view.findViewById(R.id.solution_dialog_selection);
-        ColorAdapter adapter = new ColorAdapter(this, getSelectedColors());
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        int margin = (int) getResources().getDimension(R.dimen.fab_margin);
-        params.setMargins(margin, margin, margin, 0);
+        // holes
+        final LinearLayout solutionHoles = view.findViewById(R.id.solution_dialog_selection);
+        int padding = toPixels(2);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, 1f);
         for (int i = 0; i < holeCount; i++) {
-            Spinner pinSpinner = new Spinner(this);
-            pinSpinner.setAdapter(adapter);
-            pinSpinner.setLayoutParams(params);
-            pinSelection.addView(pinSpinner);
+            ImageView hole = new ImageView(this);
+            hole.setPadding(padding, padding, padding, padding);
+            hole.setLayoutParams(params);
+            hole.setImageDrawable(colorDrawable(android.R.color.transparent));
+            hole.setOnDragListener(dragListener);
+            solutionHoles.addView(hole);
+        }
+        // colors
+        final LinearLayout solutionColors = view.findViewById(R.id.solution_dialog_colors);
+        for (int i = 0; i < setup.getColors().size(); i++) {
+            ImageView pin = new ImageView(this);
+            pin.setPadding(padding, padding, padding, padding);
+            pin.setLayoutParams(params);
+            pin.setImageDrawable(colorDrawable(setup.getColors().get(i)));
+            pin.setOnTouchListener(touchListener);
+            solutionColors.addView(pin);
         }
         final Context context = this;
         builder.setView(view).setTitle(R.string.setup_solution)
                 .setPositiveButton(android.R.string.ok, null)
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // cancelled
                     }
@@ -243,13 +252,18 @@ public class GameSetupActivity extends AppCompatActivity {
                             dialog.dismiss();
                             return;
                         }
+                        boolean empty = emptyPins.isChecked();
                         boolean duplicate = duplicatePins.isChecked();
                         List<Integer> solution = new ArrayList<>();
 
-                        for (int i = 0; i < pinSelection.getChildCount(); i++) {
-                            Spinner pinSpinner = (Spinner) pinSelection.getChildAt(i);
-                            int selectedColor = (int) pinSpinner.getSelectedItem();
-                            if (!duplicate && selectedColor != android.R.color.transparent && solution.contains(selectedColor)) {
+                        for (int i = 0; i < solutionHoles.getChildCount(); i++) {
+                            ImageView pin = (ImageView) solutionHoles.getChildAt(i);
+                            int selectedColor = getColor(pin.getDrawable());
+                            if (!empty && android.R.color.transparent == selectedColor) {
+                                Toast.makeText(context, R.string.pins_missing, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            if (!duplicate && solution.contains(selectedColor)) {
                                 Toast.makeText(context, R.string.solution_error_duplicate, Toast.LENGTH_SHORT).show();
                                 return;
                             }
@@ -348,10 +362,11 @@ public class GameSetupActivity extends AppCompatActivity {
         int holeCount = (int) holeCountSpinner.getSelectedItem();
         List<Integer> solution = new ArrayList<>();
         List<Integer> availableColors = getSelectedColors();
+        boolean duplicate = duplicatePins.isChecked();
         for (int i = 0; i < holeCount; i++) {
             Random random = new Random();
             int randomColor = availableColors.get(random.nextInt(availableColors.size()));
-            while (!duplicatePins.isChecked() && randomColor != android.R.color.transparent && solution.contains(randomColor)) {
+            while (!duplicate && solution.contains(randomColor)) {
                 randomColor = availableColors.get(random.nextInt(availableColors.size()));
             }
             solution.add(randomColor);
@@ -437,8 +452,15 @@ public class GameSetupActivity extends AppCompatActivity {
         };
     }
 
-    private SharedPreferences getSharedPreferences() {
-        return PreferenceManager.getDefaultSharedPreferences(this);
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_setup;
+    }
+
+    @Override
+    protected void setBackground() {
+        int background = getSharedPreferences().getInt(BACKGROUND_KEY, R.drawable.wood_background);
+        findViewById(R.id.setup_screen_root).setBackgroundResource(background);
     }
 }
 
