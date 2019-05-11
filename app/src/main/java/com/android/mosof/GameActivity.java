@@ -29,11 +29,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.android.mosof.components.ColorDrawable;
+import com.android.mosof.game.Game;
 import com.android.mosof.highscore.Highscore;
 import com.android.mosof.highscore.HighscoreDatabase;
 import com.android.mosof.setup.GameSetup;
 import com.android.mosof.setup.GameSetupActivity;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import java.util.ArrayList;
@@ -44,21 +46,57 @@ import static android.widget.TableLayout.LayoutParams.WRAP_CONTENT;
 
 public class GameActivity extends AppCompatActivity {
 
+    public static final String continueGame = "continueGame";
+
     private View.OnTouchListener touchListener = new PinOnTouchListener();
     private View.OnDragListener dragListener = new HoleOnDragListener();
     private View.OnClickListener clickListener = new HoleOnClickListener();
 
     private GameSetup setup;
 
+    private boolean gameEnded = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_game);
 
         int background = getSharedPreferences().getInt(GameSetupActivity.BACKGROUND_KEY, R.drawable.wood_background);
         findViewById(R.id.game_screen_root).setBackgroundResource(background);
 
-        setup = loadGameSetup();
+        // setup rows and settings depending on if it's a new or loaded game
+        Bundle bundle = getIntent().getExtras();
+        TableLayout holes = findViewById(R.id.holes_table);
+        if (bundle != null && bundle.getBoolean(continueGame)) {
+            Game game = loadGame();
+
+            if (game == null) {
+                Toast.makeText(this, R.string.load_fail, Toast.LENGTH_SHORT).show();
+                bundle.putBoolean(continueGame, false);
+                finish();
+                return;
+            }
+
+            setup = game.getSetup();
+
+            ArrayList<ArrayList<Integer>> rows = game.getRows();
+            for (int i = 0; i <= rows.size() - 1; i++) {
+                TableRow row;
+                // last row needs to have listeners
+                if (i == (rows.size() - 1)) {
+                    row = createHoleRow(rows.get(i), true);
+                } else {
+                    row = createHoleRow(rows.get(i), false);
+                    evaluateRow(row);
+                }
+                holes.addView(row);
+            }
+        } else {
+            setup = loadSettings();
+            holes.addView(createHoleRow());
+        }
+
         if (setup == null) {
             Toast.makeText(this, R.string.setup_fail, Toast.LENGTH_SHORT).show();
             finish();
@@ -77,9 +115,6 @@ public class GameActivity extends AppCompatActivity {
                 row2.addView(pin);
             }
         }
-
-        TableLayout holes = findViewById(R.id.holes_table);
-        holes.addView(createHoleRow());
 
         Button submit = findViewById(R.id.button_submit);
         submit.setOnClickListener(submitListener());
@@ -100,12 +135,19 @@ public class GameActivity extends AppCompatActivity {
     /**
      * Create a circle with the given color.
      */
-    private Drawable colorDrawable(int color) {
-        ColorDrawable drawable = new ColorDrawable(GradientDrawable.Orientation.TR_BL,
-                new int[]{ContextCompat.getColor(this, color),
-                        ContextCompat.getColor(this, R.color.nearly_black)});
-        drawable.setColorResource(color);
+    private ColorDrawable colorDrawable(int color) {
+        ColorDrawable drawable;
+        if (color == android.R.color.transparent) {
+            drawable = new ColorDrawable(GradientDrawable.Orientation.TR_BL,
+                    new int[]{ContextCompat.getColor(this, R.color.alpha96),
+                            ContextCompat.getColor(this, R.color.alpha96)});
+        } else {
+            drawable = new ColorDrawable(GradientDrawable.Orientation.TR_BL,
+                    new int[]{ContextCompat.getColor(this, color),
+                            ContextCompat.getColor(this, R.color.nearly_black)});
+        }
         drawable.setShape(GradientDrawable.OVAL);
+        drawable.setColorResource(color);
         drawable.setStroke(toPixels(1), ContextCompat.getColor(this, R.color.alpha96));
         int size = toPixels(40);
         drawable.setSize(size, size);
@@ -121,9 +163,9 @@ public class GameActivity extends AppCompatActivity {
     }
 
     /**
-     * Load game setup from shared preferences.
+     * Load settings from shared preferences.
      */
-    private GameSetup loadGameSetup() {
+    private GameSetup loadSettings() {
         String json = getSharedPreferences().getString(GameSetup.class.getSimpleName(), null);
         if (json == null) {
             return null;
@@ -136,6 +178,34 @@ public class GameActivity extends AppCompatActivity {
             return null;
         }
     }
+
+    /**
+     * Load game setup from shared preferences.
+     */
+    private Game loadGame() {
+        String json = getSharedPreferences().getString(Game.class.getSimpleName(), null);
+        if (json == null) {
+            return null;
+        }
+        try {
+            return new Gson().fromJson(json, Game.class);
+        } catch (JsonSyntaxException jse) {
+            // json incompatible - reset
+            getSharedPreferences().edit().putString(Game.class.getSimpleName(), null).apply();
+            return null;
+        }
+    }
+
+    /**
+     * Save the game setup into the shared preferences.
+     *
+     * @param game the game
+     */
+    private void saveGame(Game game) {
+        String json = new GsonBuilder().create().toJson(game);
+        getSharedPreferences().edit().putString(Game.class.getSimpleName(), json).apply();
+    }
+
 
     /**
      * {@link android.view.View.OnDragListener} for dragging pins on holes.
@@ -175,7 +245,7 @@ public class GameActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             ImageView hole = (ImageView) v;
-            hole.setImageResource(R.drawable.game_hole);
+            hole.setImageDrawable(colorDrawable(android.R.color.transparent));
             hole.setOnClickListener(null);
         }
     }
@@ -193,16 +263,18 @@ public class GameActivity extends AppCompatActivity {
                 if (holes.getChildCount() >= setup.getMaxTries()) {
                     evaluateRow(lastRow);
                     Toast.makeText(context, R.string.max_tries_surpassed, Toast.LENGTH_SHORT).show();
+                    gameEnded = true;
                     return;
                 }
                 if (checkRow(lastRow)) {
-                    // insert new row
-                    TableRow newRow = createHoleRow();
                     // remove listeners from lastRow
                     boolean won = evaluateRow(lastRow);
                     if (won) {
                         winDialog(holes.getChildCount(), setup.getHoleCount(), setup.getColors().size(), setup.getEmptyPins(), setup.getDuplicatePins()).show();
+                        gameEnded = true;
                     } else {
+                        // insert new row
+                        TableRow newRow = createHoleRow();
                         holes.addView(newRow);
                     }
                     final ScrollView sv = findViewById(R.id.holes_scroll_view);
@@ -277,6 +349,17 @@ public class GameActivity extends AppCompatActivity {
      * Create a new row of holes.
      */
     private TableRow createHoleRow() {
+        return createHoleRow(null, true);
+    }
+
+    /**
+     * Create a new row of holes.
+     *
+     * @param colors      the colors for the different holes
+     * @param addListener boolean if the listeners should be added or not (only for last row)
+     * @return a row with holes
+     */
+    private TableRow createHoleRow(ArrayList<Integer> colors, boolean addListener) {
         TableRow row = new TableRow(this);
         TableLayout.LayoutParams params = new TableLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         row.setLayoutParams(params);
@@ -287,8 +370,14 @@ public class GameActivity extends AppCompatActivity {
             hole.setPadding(padding, padding, padding, padding);
             TableRow.LayoutParams holeParams = new TableRow.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, 1f);
             hole.setLayoutParams(holeParams);
-            hole.setImageDrawable(getDrawable(R.drawable.game_hole));
-            hole.setOnDragListener(dragListener);
+            if (colors != null) {
+                hole.setImageDrawable(colorDrawable(colors.get(i)));
+            } else {
+                hole.setImageDrawable(colorDrawable(android.R.color.transparent));
+            }
+            if (addListener) {
+                hole.setOnDragListener(dragListener);
+            }
             row.addView(hole);
         }
         // black hint
@@ -310,7 +399,7 @@ public class GameActivity extends AppCompatActivity {
         TextView hint = new TextView(this);
         hint.setLayoutParams(params);
         hint.setGravity(Gravity.CENTER);
-        hint.setText("0");
+        hint.setText("-");
         hint.setBackgroundColor(ContextCompat.getColor(this, backgroundColor));
         hint.setTextColor(ContextCompat.getColor(this, textColor));
         hint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
@@ -416,5 +505,43 @@ public class GameActivity extends AppCompatActivity {
 
     private SharedPreferences getSharedPreferences() {
         return PreferenceManager.getDefaultSharedPreferences(this);
+    }
+
+    /**
+     * Gathers the important data to create a Game object
+     *
+     * @return the Game object
+     */
+    private Game getGameData() {
+        if (!gameEnded) {
+            ArrayList<ArrayList<Integer>> rows = new ArrayList<>();
+            TableLayout holes = findViewById(R.id.holes_table);
+            for (int i = 0; i < holes.getChildCount(); i++) {
+                TableRow row = (TableRow) holes.getChildAt(i);
+                //rows.add(row);
+                ArrayList<Integer> holeList = new ArrayList<>();
+                for (int j = 0; j < row.getChildCount(); j++) {
+                    View view = row.getChildAt(j);
+                    if (view instanceof ImageView) {
+                        holeList.add(((ColorDrawable) ((ImageView) view).getDrawable()).getColorResource());
+                    }
+                }
+                rows.add(holeList);
+            }
+            return new Game(rows, setup);
+        }
+        return null;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveGame(getGameData());
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        saveGame(getGameData());
     }
 }
