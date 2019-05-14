@@ -7,6 +7,8 @@ import java.util.ArrayList;
 public class Game {
     private ArrayList<ArrayList<Integer>> rows;
 
+    private Boolean undo = false;
+
     private GameSetup setup;
 
     public Game(ArrayList<ArrayList<Integer>> rows, GameSetup setup) {
@@ -16,6 +18,15 @@ public class Game {
 
     public ArrayList<ArrayList<Integer>> getRows() {
         return rows;
+    }
+
+    public Game setUndo(Boolean undo) {
+        this.undo = undo;
+        return this;
+    }
+
+    public Boolean getUndo() {
+        return undo;
     }
 
     public GameSetup getSetup() {

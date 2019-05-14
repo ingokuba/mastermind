@@ -11,6 +11,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
@@ -39,7 +40,10 @@ public class GameActivity extends AbstractActivity {
 
     public static final String continueGame = "continueGame";
 
+    private TableLayout holes;
+
     private GameSetup setup;
+    private Boolean undo = false;
 
     private boolean gameEnded = false;
 
@@ -49,7 +53,7 @@ public class GameActivity extends AbstractActivity {
 
         // setup rows and settings depending on if it's a new or loaded game
         Bundle bundle = getIntent().getExtras();
-        TableLayout holes = findViewById(R.id.holes_table);
+        holes = findViewById(R.id.holes_table);
         if (bundle != null && bundle.getBoolean(continueGame)) {
             Game game = loadGame();
 
@@ -61,6 +65,7 @@ public class GameActivity extends AbstractActivity {
             }
 
             setup = game.getSetup();
+            undo = game.getUndo();
 
             ArrayList<ArrayList<Integer>> rows = game.getRows();
             for (int i = 0; i <= rows.size() - 1; i++) {
@@ -100,6 +105,9 @@ public class GameActivity extends AbstractActivity {
 
         Button submit = findViewById(R.id.button_submit);
         submit.setOnClickListener(submitListener());
+
+        ImageButton undo = findViewById(R.id.button_undo);
+        undo.setOnClickListener(undoListener());
     }
 
     private ImageView getPin(int color) {
@@ -373,29 +381,40 @@ public class GameActivity extends AbstractActivity {
     private Dialog winDialog(final int tries, final int holes, final int pins, final boolean emptyPins, final boolean duplicatePins) {
         final Context context = this;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View view = View.inflate(this, R.layout.edit_dialog, null);
-        final EditText inputField = view.findViewById(R.id.edit_dialog_input);
-        builder.setView(view).setTitle(R.string.win_title).setMessage(R.string.win_message)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String name = inputField.getText().toString();
-                        if (name.isEmpty()) {
-                            return;
+        builder.setTitle(R.string.win_title);
+
+        if (undo) {
+            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+        } else {
+            View view = View.inflate(this, R.layout.edit_dialog, null);
+            final EditText inputField = view.findViewById(R.id.edit_dialog_input);
+            builder.setView(view).setMessage(R.string.win_message)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String name = inputField.getText().toString();
+                            if (name.isEmpty()) {
+                                return;
+                            }
+                            // store highscore in database
+                            Highscore highscore = new Highscore(name.trim(), tries, holes, pins, emptyPins, duplicatePins);
+                            HighscoreDatabase database = HighscoreDatabase.get(context);
+                            database.highscores().insert(highscore);
+                            database.close();
+                            // store highscore to preferences
+                            String json = new Gson().toJson(highscore);
+                            getSharedPreferences().edit().putString(Highscore.class.getSimpleName(), json).apply();
+                            // switch to highscore view
+                            startActivity(new Intent(context, HighscoreActivity.class));
+                            finish();
                         }
-                        // store highscore in database
-                        Highscore highscore = new Highscore(name.trim(), tries, holes, pins, emptyPins, duplicatePins);
-                        HighscoreDatabase database = HighscoreDatabase.get(context);
-                        database.highscores().insert(highscore);
-                        database.close();
-                        // store highscore to preferences
-                        String json = new Gson().toJson(highscore);
-                        getSharedPreferences().edit().putString(Highscore.class.getSimpleName(), json).apply();
-                        // switch to highscore view
-                        startActivity(new Intent(context, HighscoreActivity.class));
-                        finish();
-                    }
-                });
+                    });
+        }
         return builder.create();
     }
 
@@ -420,9 +439,49 @@ public class GameActivity extends AbstractActivity {
                 }
                 rows.add(holeList);
             }
-            return new Game(rows, setup);
+            return new Game(rows, setup).setUndo(undo);
         }
         return null;
+    }
+
+    private View.OnClickListener undoListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (holes.getChildCount() <= 1) {
+                    // cannot undo if there is no row
+                    return;
+                }
+                if (!undo) {
+                    undoDialog().show();
+                } else {
+                    undoLastRow();
+                }
+            }
+        };
+    }
+
+    /**
+     * Remove the last hole row.
+     */
+    private void undoLastRow() {
+        holes.removeViewAt(holes.getChildCount() - 2);
+    }
+
+    /**
+     * Create a dialog for the first undo click.
+     */
+    private Dialog undoDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(android.R.string.dialog_alert_title).setMessage(R.string.undo_warning)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        undo = true;
+                        undoLastRow();
+                    }
+                });
+        return builder.create();
     }
 
     @Override
