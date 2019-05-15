@@ -3,18 +3,28 @@ package com.android.mosof;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-
-import androidx.appcompat.app.AppCompatActivity;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.android.mosof.game.Game;
 import com.android.mosof.setup.GameSetupActivity;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import java.util.Arrays;
+import java.util.List;
+
+public class MainActivity extends AbstractActivity implements View.OnClickListener {
+
+    /**
+     * Key for the background resource as integer in {@link SharedPreferences}.
+     */
+    public static final String BACKGROUND_KEY = "Background";
+    private static final List<Integer> BACKGROUNDS = Arrays.asList(R.string.wood, R.string.morocco, R.string.banana);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
         }
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         Button buttonRules = findViewById(R.id.app_rules);
         Button buttonAbout = findViewById(R.id.app_about);
@@ -42,6 +51,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             buttonContinueGame.setVisibility(View.VISIBLE);
             buttonContinueGame.setOnClickListener(this);
         }
+
+        // Background for the app
+        ArrayAdapter<String> backgroundAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, getBackgroundNames());
+        Spinner backgroundSpinner = findViewById(R.id.background_selector);
+        backgroundSpinner.setAdapter(backgroundAdapter);
+        backgroundSpinner.setOnItemSelectedListener(backgroundListener());
+        // load previous background
+        int backgroundId = getSharedPreferences().getInt(BACKGROUND_KEY, R.drawable.wood_background);
+        Integer id = getItemId(backgroundSpinner, getBackgroundName(backgroundId));
+        if (id != null) {
+            backgroundSpinner.setSelection(id);
+        }
+    }
+
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected int getMainLayout() {
+        return R.id.main_layout;
     }
 
     @Override
@@ -89,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * Checks if there is a saved game available
+     *
      * @return true or false
      */
     private boolean isSaveGameAvailable() {
@@ -106,10 +138,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * Gets the shared preferences.
-     * @return the preferences
+     * Transform string ids for the backgrounds to a string array.
      */
-    private SharedPreferences getSharedPreferences() {
-        return PreferenceManager.getDefaultSharedPreferences(this);
+    private String[] getBackgroundNames() {
+        String[] names = new String[BACKGROUNDS.size()];
+        for (int i = 0; i < names.length; i++) {
+            names[i] = getString(BACKGROUNDS.get(i));
+        }
+        return names;
+    }
+
+    /**
+     * Get the matching background name for the drawable id.
+     */
+    private String getBackgroundName(int resourceId) {
+        switch (resourceId) {
+            case R.drawable.morocco_background:
+                return getString(R.string.morocco);
+            case R.drawable.banana_background:
+                return getString(R.string.banana);
+            default:
+                return getString(R.string.wood);
+        }
+    }
+
+    private AdapterView.OnItemSelectedListener backgroundListener() {
+        return new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String name = (String) parent.getItemAtPosition(position);
+                int resourceId = R.drawable.wood_background;
+                if (name.equals(getString(R.string.morocco))) {
+                    resourceId = R.drawable.morocco_background;
+                } else if (name.equals(getString(R.string.banana))) {
+                    resourceId = R.drawable.banana_background;
+                }
+                if (getSharedPreferences().edit().putInt(BACKGROUND_KEY, resourceId).commit()) {
+                    findViewById(R.id.main_layout).setBackgroundResource(resourceId);
+                }
+                if (view instanceof TextView) {
+                    ((TextView) view).setText(null);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        };
     }
 }

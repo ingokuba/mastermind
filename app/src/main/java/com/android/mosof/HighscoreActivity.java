@@ -1,16 +1,12 @@
 package com.android.mosof;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Spinner;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.mosof.highscore.Highscore;
 import com.android.mosof.highscore.HighscoreAdapter;
@@ -20,7 +16,7 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
-public class HighscoreActivity extends AppCompatActivity {
+public class HighscoreActivity extends AbstractActivity {
 
     private HighscoreDatabase database;
 
@@ -37,7 +33,6 @@ public class HighscoreActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_highscore);
         highscoreList = findViewById(R.id.highscore);
 
         database = HighscoreDatabase.get(this);
@@ -61,6 +56,16 @@ public class HighscoreActivity extends AppCompatActivity {
         loadLatestHighscore();
     }
 
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_highscore;
+    }
+
+    @Override
+    protected int getMainLayout() {
+        return R.id.highscore_layout;
+    }
+
     private void loadLatestHighscore() {
         String json = getSharedPreferences().getString(Highscore.class.getSimpleName(), null);
         if (json == null) {
@@ -72,20 +77,6 @@ public class HighscoreActivity extends AppCompatActivity {
         pinsSpinner.setSelection(getItemId(pinsSpinner, highscore.getPins()));
         emptyCheck.setChecked(highscore.getEmptyPins());
         duplicateCheck.setChecked(highscore.getDuplicatePins());
-    }
-
-    /**
-     * Look for a value in a spinner component.
-     *
-     * @return the id of the item or null.
-     */
-    private Integer getItemId(Spinner spinner, Object value) {
-        for (int i = 0; i < spinner.getCount(); i++) {
-            if (spinner.getItemAtPosition(i).equals(value)) {
-                return i;
-            }
-        }
-        return null;
     }
 
     private void searchHighscores() {
@@ -120,9 +111,5 @@ public class HighscoreActivity extends AppCompatActivity {
     protected void onDestroy() {
         database.close();
         super.onDestroy();
-    }
-
-    private SharedPreferences getSharedPreferences() {
-        return PreferenceManager.getDefaultSharedPreferences(this);
     }
 }

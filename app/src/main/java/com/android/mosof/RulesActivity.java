@@ -1,14 +1,21 @@
 package com.android.mosof;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 
-public class RulesActivity extends AppCompatActivity {
+public class RulesActivity extends AbstractActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_rules);
+    }
+
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_rules;
+    }
+
+    @Override
+    protected int getMainLayout() {
+        return R.id.rules_layout;
     }
 }

@@ -26,7 +26,6 @@ import com.android.mosof.game.Game;
 import com.android.mosof.highscore.Highscore;
 import com.android.mosof.highscore.HighscoreDatabase;
 import com.android.mosof.setup.GameSetup;
-import com.android.mosof.setup.GameSetupActivity;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -50,7 +49,7 @@ public class GameActivity extends AbstractActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        findViewById(getMainLayout()).setOnDragListener(removePinDragListener);
         // setup rows and settings depending on if it's a new or loaded game
         Bundle bundle = getIntent().getExtras();
         holes = findViewById(R.id.holes_table);
@@ -281,6 +280,7 @@ public class GameActivity extends AbstractActivity {
             }
             if (addListener) {
                 hole.setOnDragListener(dragListener);
+                hole.setOnTouchListener(colors == null ? null : removePinTouchListener);
             }
             row.addView(hole);
         }
@@ -322,7 +322,7 @@ public class GameActivity extends AbstractActivity {
             if (view instanceof ImageView) {
                 ImageView hole = (ImageView) view;
                 configuration.add(getColor(hole.getDrawable()));
-                view.setOnClickListener(null);
+                view.setOnTouchListener(null);
                 view.setOnDragListener(null);
                 continue;
             }
@@ -502,8 +502,7 @@ public class GameActivity extends AbstractActivity {
     }
 
     @Override
-    protected void setBackground() {
-        int background = getSharedPreferences().getInt(GameSetupActivity.BACKGROUND_KEY, R.drawable.wood_background);
-        findViewById(R.id.game_screen_root).setBackgroundResource(background);
+    protected int getMainLayout() {
+        return R.id.game_screen_root;
     }
 }

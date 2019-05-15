@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,7 +28,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -42,12 +40,6 @@ public class GameSetupActivity extends AbstractActivity {
 
     private GameSetup setup = new GameSetup();
 
-    /**
-     * Key for the background resource as integer in {@link SharedPreferences}.
-     */
-    public static final String BACKGROUND_KEY = "Background";
-    private static final List<Integer> BACKGROUNDS = Arrays.asList(R.string.wood, R.string.morocco, R.string.banana);
-
     private Spinner holeCountSpinner;
     private Spinner pinCountSpinner;
     private CheckBox duplicatePins;
@@ -58,17 +50,6 @@ public class GameSetupActivity extends AbstractActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Background for the app
-        ArrayAdapter<String> backgroundAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, getBackgroundNames());
-        Spinner backgroundSpinner = findViewById(R.id.background_selector);
-        backgroundSpinner.setAdapter(backgroundAdapter);
-        backgroundSpinner.setOnItemSelectedListener(backgroundListener());
-        // load previous background
-        int backgroundId = getSharedPreferences().getInt(BACKGROUND_KEY, R.drawable.wood_background);
-        Integer id = getItemId(backgroundSpinner, getBackgroundName(backgroundId));
-        if (id != null) {
-            backgroundSpinner.setSelection(id);
-        }
         // Amount of holes
         ArrayAdapter<Integer> holeAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, HOLE_COUNTS);
         holeCountSpinner = findViewById(R.id.hole_count);
@@ -138,20 +119,6 @@ public class GameSetupActivity extends AbstractActivity {
         emptyPins.setChecked(setup.getEmptyPins());
     }
 
-    /**
-     * Look for a value in a spinner component.
-     *
-     * @return the id of the item or null.
-     */
-    private Integer getItemId(Spinner spinner, Object value) {
-        for (int i = 0; i < spinner.getCount(); i++) {
-            if (spinner.getItemAtPosition(i).equals(value)) {
-                return i;
-            }
-        }
-        return null;
-    }
-
     private AdapterView.OnItemSelectedListener holeCountListener() {
         return new AdapterView.OnItemSelectedListener() {
             @Override
@@ -205,6 +172,7 @@ public class GameSetupActivity extends AbstractActivity {
         final int holeCount = (int) holeCountSpinner.getSelectedItem();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = View.inflate(this, R.layout.solution_dialog, null);
+        view.getRootView().setOnDragListener(removePinDragListener);
         // holes
         final LinearLayout solutionHoles = view.findViewById(R.id.solution_dialog_selection);
         int padding = toPixels(2);
@@ -405,62 +373,14 @@ public class GameSetupActivity extends AbstractActivity {
         };
     }
 
-    /**
-     * Transform string ids for the backgrounds to a string array.
-     */
-    private String[] getBackgroundNames() {
-        String[] names = new String[BACKGROUNDS.size()];
-        for (int i = 0; i < names.length; i++) {
-            names[i] = getString(BACKGROUNDS.get(i));
-        }
-        return names;
-    }
-
-    /**
-     * Get the matching background name for the drawable id.
-     */
-    private String getBackgroundName(int resourceId) {
-        switch (resourceId) {
-            case R.drawable.morocco_background:
-                return getString(R.string.morocco);
-            case R.drawable.banana_background:
-                return getString(R.string.banana);
-            default:
-                return getString(R.string.wood);
-        }
-    }
-
-    private AdapterView.OnItemSelectedListener backgroundListener() {
-        return new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String name = (String) parent.getItemAtPosition(position);
-                int resourceId = R.drawable.wood_background;
-                if (name.equals(getString(R.string.morocco))) {
-                    resourceId = R.drawable.morocco_background;
-                } else if (name.equals(getString(R.string.banana))) {
-                    resourceId = R.drawable.banana_background;
-                }
-                if (getSharedPreferences().edit().putInt(BACKGROUND_KEY, resourceId).commit()) {
-                    findViewById(R.id.setup_screen_root).setBackgroundResource(resourceId);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        };
-    }
-
     @Override
     protected int getContentView() {
         return R.layout.activity_setup;
     }
 
     @Override
-    protected void setBackground() {
-        int background = getSharedPreferences().getInt(BACKGROUND_KEY, R.drawable.wood_background);
-        findViewById(R.id.setup_screen_root).setBackgroundResource(background);
+    protected int getMainLayout() {
+        return R.id.setup_screen_root;
     }
 }
 
