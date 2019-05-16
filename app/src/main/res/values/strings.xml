@@ -9,12 +9,10 @@
     </string>
     <string name="rules_white">richtige\u00A0Farbe, falsche\u00A0Position</string>
     <string name="rules_black">richtige\u00A0Farbe, richtige\u00A0Position</string>
-    <string name="how_to_play_heading">How to play:</string>
-    <string name="how_to_play">Zum Setzen den Pin zum gewünschten Loch ziehen. Entfernen durch Klicken.</string>
     <string name="app_rules">Regeln</string>
     <string name="app_highscore">Highscores</string>
     <string name="app_about">Über diese App</string>
-    <string name="app_version">Version: 2.0</string>
+    <string name="app_version">Version: 3.0</string>
     <string name="app_copyright">Copyright: MOSOF Games</string>
     <string name="app_group">Gruppe B:\n
         &#8226; Hendrik Mewissen\n
@@ -44,6 +42,7 @@
     <string name="pin_color_error">Farben der Pins dürfen nicht doppelt auftreten.</string>
     <string name="max_tries">Max. Versuche</string>
     <string name="max_tries_default">12</string>
+    <string name="max_tries_hint">min. 1</string>
     <string name="max_tries_error">Maximale Versuche muss mindestens 1 betragen.</string>
     <string name="allow_duplicate_pins">Mehrfache Farben erlauben</string>
     <string name="allow_empty_pins">Leere Stellen erlauben</string>

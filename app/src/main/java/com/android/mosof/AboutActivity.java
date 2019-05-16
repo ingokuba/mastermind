@@ -1,14 +1,21 @@
 package com.android.mosof;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 
-public class AboutActivity extends AppCompatActivity {
+public class AboutActivity extends AbstractActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about);
+    }
+
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_about;
+    }
+
+    @Override
+    protected int getMainLayout() {
+        return R.id.about_layout;
     }
 }

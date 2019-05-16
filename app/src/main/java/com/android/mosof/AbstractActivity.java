@@ -10,6 +10,7 @@ import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,18 +22,26 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     protected View.OnTouchListener touchListener = new PinOnTouchListener();
     protected View.OnDragListener dragListener = new HoleOnDragListener();
-    private View.OnClickListener clickListener = new HoleOnClickListener();
+    protected View.OnTouchListener removePinTouchListener = new RemovePinTouchListener();
+    protected View.OnDragListener removePinDragListener = new RemovePinDragListener();
+
+    private static final String REMOVE = "remove";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getContentView());
-        setBackground();
+        setBackground(getMainLayout());
     }
 
     protected abstract int getContentView();
 
-    protected abstract void setBackground();
+    protected abstract int getMainLayout();
+
+    private void setBackground(int layoutId) {
+        int background = getSharedPreferences().getInt(MainActivity.BACKGROUND_KEY, R.drawable.wood_background);
+        findViewById(layoutId).setBackgroundResource(background);
+    }
 
     public SharedPreferences getSharedPreferences() {
         return PreferenceManager.getDefaultSharedPreferences(this);
@@ -92,8 +101,13 @@ public abstract class AbstractActivity extends AppCompatActivity {
             if (DragEvent.ACTION_DROP == event.getAction()) {
                 ImageView hole = (ImageView) v; //get object that the other was dragged on
                 ImageView pin = (ImageView) event.getLocalState(); // get object that was dragged
+                Drawable previousDrawable = hole.getDrawable(); // get drawable of hole/pin
                 hole.setImageDrawable(pin.getDrawable());
-                hole.setOnClickListener(clickListener);
+                hole.setOnTouchListener(removePinTouchListener);
+                if (REMOVE.contentEquals(event.getClipData().getDescription().getLabel())) {
+                    pin.setImageDrawable(previousDrawable);
+                    pin.setOnTouchListener(getColor(previousDrawable) == android.R.color.transparent ? null : removePinTouchListener);
+                }
             }
             return true;
         }
@@ -115,14 +129,46 @@ public abstract class AbstractActivity extends AppCompatActivity {
     }
 
     /**
-     * {@link android.view.View.OnClickListener} to reset holes to empty ones.
+     * {@link android.view.View.OnTouchListener} for starting the removal of pins.
      */
-    private final class HoleOnClickListener implements View.OnClickListener {
+    private final class RemovePinTouchListener implements View.OnTouchListener {
         @Override
-        public void onClick(View v) {
-            ImageView hole = (ImageView) v;
-            hole.setImageDrawable(colorDrawable(android.R.color.transparent));
-            hole.setOnClickListener(null);
+        public boolean onTouch(View v, MotionEvent event) {
+            if (MotionEvent.ACTION_DOWN == event.getAction()) {
+                ClipData data = ClipData.newPlainText(REMOVE, "");
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+                v.startDrag(data, shadowBuilder, v, 0);
+            }
+            return true;
         }
+    }
+
+    /**
+     * {@link android.view.View.OnDragListener} for removing pins from holes.
+     */
+    private final class RemovePinDragListener implements View.OnDragListener {
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            if (DragEvent.ACTION_DROP == event.getAction() && REMOVE.contentEquals(event.getClipData().getDescription().getLabel())) {
+                ImageView pin = (ImageView) event.getLocalState(); // get object that was dragged
+                pin.setImageDrawable(colorDrawable(android.R.color.transparent));
+                pin.setOnTouchListener(null);
+            }
+            return true;
+        }
+    }
+
+    /**
+     * Look for a value in a spinner component.
+     *
+     * @return the id of the item or null.
+     */
+    protected Integer getItemId(Spinner spinner, Object value) {
+        for (int i = 0; i < spinner.getCount(); i++) {
+            if (spinner.getItemAtPosition(i).equals(value)) {
+                return i;
+            }
+        }
+        return null;
     }
 }
