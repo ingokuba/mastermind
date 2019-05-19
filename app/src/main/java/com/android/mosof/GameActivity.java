@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -169,16 +170,13 @@ public class GameActivity extends AbstractActivity {
      * Creates a {@link android.view.View.OnClickListener} for the submit button to check user input.
      */
     private View.OnClickListener submitListener() {
-        final Context context = this;
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TableLayout holes = findViewById(R.id.holes_table);
                 TableRow lastRow = (TableRow) holes.getChildAt(holes.getChildCount() - 1);
                 if (holes.getChildCount() >= setup.getMaxTries()) {
-                    evaluateRow(lastRow);
-                    Toast.makeText(context, R.string.max_tries_surpassed, Toast.LENGTH_SHORT).show();
-                    gameEnded = true;
+                    loseDialog(setup.getSolution()).show();
                     return;
                 }
                 if (checkRow(lastRow)) {
@@ -202,6 +200,33 @@ public class GameActivity extends AbstractActivity {
                 }
             }
         };
+    }
+
+    /**
+     * Display a Dialog with the solution in case the game was lost.
+     */
+    private Dialog loseDialog(List<Integer> solution) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = View.inflate(this, R.layout.lose_dialog, null);
+        LinearLayout solutionRow = view.findViewById(R.id.lose_dialog_solution);
+        for (Integer color : solution) {
+            ImageView pin = new ImageView(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, 1f);
+            int margin = toPixels(2);
+            params.setMargins(margin, margin, margin, margin);
+            pin.setLayoutParams(params);
+            pin.setImageDrawable(colorDrawable(color));
+            solutionRow.addView(pin);
+        }
+        String message = getString(R.string.solution) + ":";
+        builder.setView(view).setTitle(R.string.lose_title).setMessage(message).setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                gameEnded = true;
+                finish();
+            }
+        }).setPositiveButton(android.R.string.ok, null);
+        return builder.create();
     }
 
     /**

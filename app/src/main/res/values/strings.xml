@@ -59,7 +59,6 @@
     <string name="load_fail">Spiel konnte nicht geladen werden</string>
     <string name="pins_missing">Alle Löcher müssen gesetzt sein!</string>
     <string name="pins_duplicate">Farben dürfen nicht mehrfach auftreten!</string>
-    <string name="max_tries_surpassed">Maximale Versuche überschritten!</string>
     <string name="win_title">Gewonnen!</string>
     <string name="win_message">Gib deinen Namen ein</string>
     <string name="empty_pins">Leere Löcher</string>
@@ -67,4 +66,5 @@
     <string name="place">Platz</string>
     <string name="tries">Versuche</string>
     <string name="undo_warning">Das Spiel wird nicht gewertet, wenn ein Zug rückgängig gemacht wurde.</string>
+    <string name="lose_title">Verloren!</string>
 </resources>
