@@ -44,6 +44,11 @@ public class GameSetup {
      */
     private List<Integer> solution;
 
+    /**
+     * Flag to determine whether the solution was set by a person.
+     */
+    private Boolean playerMode = true;
+
     public Integer getHoleCount() {
         return holeCount;
     }
@@ -98,6 +103,15 @@ public class GameSetup {
 
     public GameSetup setSolution(List<Integer> solution) {
         this.solution = solution;
+        return this;
+    }
+
+    public Boolean getPlayerMode() {
+        return playerMode;
+    }
+
+    public GameSetup setPlayerMode(Boolean playerMode) {
+        this.playerMode = playerMode;
         return this;
     }
 

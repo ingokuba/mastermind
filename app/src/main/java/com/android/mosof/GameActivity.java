@@ -418,8 +418,7 @@ public class GameActivity extends AbstractActivity {
         final Context context = this;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.win_title);
-
-        if (undo) {
+        if (undo || setup.getPlayerMode()) {
             builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

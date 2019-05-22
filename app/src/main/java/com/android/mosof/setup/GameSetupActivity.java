@@ -196,7 +196,7 @@ public class GameSetupActivity extends AbstractActivity {
             solutionColors.addView(pin);
         }
         final Context context = this;
-        builder.setView(view).setTitle(R.string.setup_solution)
+        builder.setView(view).setTitle(R.string.setup_solution).setMessage(R.string.player_mode_message)
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -275,11 +275,13 @@ public class GameSetupActivity extends AbstractActivity {
                     // hide button
                     button.setVisibility(View.GONE);
                     computerMode = true;
+                    setup.setPlayerMode(false);
                 } else if (checkedId == R.id.mode_player) {
                     // display button
                     button.setVisibility(View.VISIBLE);
                     computerMode = false;
                     setup.setSolution(null);
+                    setup.setPlayerMode(true);
                 }
             }
         };
