@@ -1,6 +1,7 @@
 package com.android.mosof.highscore;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
@@ -18,4 +19,7 @@ public interface HighscoreDao {
 
     @Insert
     void insert(Highscore highscore);
+
+    @Delete
+    void delete(Highscore highscore);
 }
