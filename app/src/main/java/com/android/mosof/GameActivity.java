@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -41,6 +42,8 @@ public class GameActivity extends AbstractActivity {
     public static final String continueGame = "continueGame";
 
     private TableLayout holes;
+    private ProgressBar triesLeftBar;
+    private TextView triesLeftText;
 
     private GameSetup setup;
     private Boolean undo = false;
@@ -108,6 +111,10 @@ public class GameActivity extends AbstractActivity {
 
         ImageButton undo = findViewById(R.id.button_undo);
         undo.setOnClickListener(undoListener());
+
+        triesLeftBar = findViewById(R.id.tries_left_progress);
+        triesLeftText = findViewById(R.id.tries_left_text);
+        updateTriesLeft();
     }
 
     private ImageView getPin(int color) {
@@ -174,21 +181,25 @@ public class GameActivity extends AbstractActivity {
             @Override
             public void onClick(View v) {
                 TableLayout holes = findViewById(R.id.holes_table);
-                TableRow lastRow = (TableRow) holes.getChildAt(holes.getChildCount() - 1);
-                if (holes.getChildCount() >= setup.getMaxTries()) {
-                    loseDialog(setup.getSolution()).show();
-                    return;
-                }
+                int currentTries = holes.getChildCount();
+                TableRow lastRow = (TableRow) holes.getChildAt(currentTries - 1);
                 if (checkRow(lastRow)) {
+                    // only end on valid row
+                    if (currentTries >= setup.getMaxTries()) {
+                        loseDialog(setup.getSolution()).show();
+                        return;
+                    }
                     // remove listeners from lastRow
                     boolean won = evaluateRow(lastRow);
                     if (won) {
-                        winDialog(holes.getChildCount(), setup.getHoleCount(), setup.getColors().size(), setup.getEmptyPins(), setup.getDuplicatePins()).show();
+                        winDialog(currentTries, setup.getHoleCount(), setup.getColors().size(), setup.getEmptyPins(), setup.getDuplicatePins()).show();
                         gameEnded = true;
                     } else {
                         // insert new row
                         TableRow newRow = createHoleRow();
                         holes.addView(newRow);
+                        // set tries left
+                        updateTriesLeft();
                     }
                     final ScrollView sv = findViewById(R.id.holes_scroll_view);
                     sv.post(new Runnable() {
@@ -491,6 +502,7 @@ public class GameActivity extends AbstractActivity {
      */
     private void undoLastRow() {
         holes.removeViewAt(holes.getChildCount() - 2);
+        updateTriesLeft();
     }
 
     /**
@@ -507,6 +519,17 @@ public class GameActivity extends AbstractActivity {
                     }
                 });
         return builder.create();
+    }
+
+    /**
+     * Update progress bar and text for tries left.
+     */
+    private void updateTriesLeft() {
+        final int currentTries = holes.getChildCount() - 1;
+        final int maxTries = setup.getMaxTries();
+        int progress = (int) (((double) currentTries) / maxTries * 100);
+        triesLeftBar.setProgress(progress);
+        triesLeftText.setText(String.format(getString(R.string.tries_left), currentTries, maxTries));
     }
 
     @Override
