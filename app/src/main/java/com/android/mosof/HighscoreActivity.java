@@ -1,5 +1,8 @@
 package com.android.mosof;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,12 +31,13 @@ public class HighscoreActivity extends AbstractActivity {
 
     private SortItemListener sortItemListener = new SortItemListener();
     private SortCheckedListener sortCheckedListener = new SortCheckedListener();
-
+    private DeleteHighscoreListener deleteHighscoreListener = new DeleteHighscoreListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         highscoreList = findViewById(R.id.highscore);
+        highscoreList.setOnItemLongClickListener(deleteHighscoreListener);
 
         database = HighscoreDatabase.get(this);
 
@@ -105,6 +109,32 @@ public class HighscoreActivity extends AbstractActivity {
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
         }
+    }
+
+    private class DeleteHighscoreListener implements AdapterView.OnItemLongClickListener {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            Highscore highscore = (Highscore) parent.getItemAtPosition(position);
+            deleteHighscoreDialog(highscore).show();
+            return true;
+        }
+    }
+
+    /**
+     * Display confirmation dialog for the deletion of a highscore.
+     */
+    private Dialog deleteHighscoreDialog(final Highscore highscore) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(android.R.string.dialog_alert_title).setMessage(R.string.delete_highscore_message)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        database.highscores().delete(highscore);
+                        searchHighscores();
+                    }
+                });
+        return builder.create();
     }
 
     @Override

@@ -69,4 +69,5 @@
     <string name="lose_title">Verloren!</string>
     <string name="tries_left">%1$d/%2$d</string>
     <string name="player_mode_message">Spiele gegen andere Spieler werden nicht gewertet!</string>
+    <string name="delete_highscore_message">Wollen Sie diesen Eintrag wirklich löschen? Dies kann nicht rückgängig gemacht werden.</string>
 </resources>
