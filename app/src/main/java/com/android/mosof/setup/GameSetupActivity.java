@@ -44,6 +44,7 @@ public class GameSetupActivity extends AbstractActivity {
     private Spinner pinCountSpinner;
     private CheckBox duplicatePins;
     private CheckBox emptyPins;
+    private RadioGroup gameModeSelection;
 
     private boolean computerMode = true;
 
@@ -75,7 +76,7 @@ public class GameSetupActivity extends AbstractActivity {
             }
         });
 
-        RadioGroup gameModeSelection = findViewById(R.id.game_mode);
+        gameModeSelection = findViewById(R.id.game_mode);
         gameModeSelection.setOnCheckedChangeListener(gameModeListener(setSolution));
 
         loadPreviousSetup();
@@ -299,6 +300,7 @@ public class GameSetupActivity extends AbstractActivity {
             @Override
             public void onClick(View v) {
                 setup.setMaxTries(getMaxTries());
+                setup.setPlayerMode(gameModeSelection.getCheckedRadioButtonId() == R.id.mode_player);
                 if (!setup.getDuplicatePins() && !setup.getEmptyPins() && setup.getColors().size() < setup.getHoleCount()) {
                     Toast.makeText(context, R.string.hole_count_toobig_error, Toast.LENGTH_LONG).show();
                     return;
